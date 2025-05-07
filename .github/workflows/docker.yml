@@ -1,0 +1,37 @@
+name: Build and Push Docker Image
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Log in to GHCR
+        run: echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ secrets.GHCR_USERNAME }} --password-stdin
+
+      - name: Set lowercase username
+        id: lower
+        run: echo "username_lc=${GHCR_USERNAME,,}" >> $GITHUB_OUTPUT
+        env:
+          GHCR_USERNAME: ${{ secrets.GHCR_USERNAME }}
+
+      - name: Extract version
+        id: vars
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+      - name: Build and tag Docker image
+        run: |
+          docker build -t ghcr.io/${{ steps.lower.outputs.username_lc }}/asp-ci-demo:${{ steps.vars.outputs.VERSION }} .
+          docker tag ghcr.io/${{ steps.lower.outputs.username_lc }}/asp-ci-demo:${{ steps.vars.outputs.VERSION }} ghcr.io/${{ steps.lower.outputs.username_lc }}/asp-ci-demo:latest
+
+      - name: Push Docker images
+        run: |
+          docker push ghcr.io/${{ steps.lower.outputs.username_lc }}/asp-ci-demo:${{ steps.vars.outputs.VERSION }}
+          docker push ghcr.io/${{ steps.lower.outputs.username_lc }}/asp-ci-demo:latest
