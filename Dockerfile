@@ -1,13 +1,24 @@
-FROM mcr.microsoft.com/dotnet/aspnet:9.0-preview AS base
-WORKDIR /app
-EXPOSE 80
+# ----- 建置階段 -----
+  FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+  WORKDIR /app
+  
+  # 複製 csproj 並還原
+  COPY *.csproj ./
+  RUN dotnet restore
+  
+  # 複製所有原始碼並建置
+  COPY . ./
+  RUN dotnet publish -c Release -o /out
+  
+  # ----- 執行階段 -----
+  FROM mcr.microsoft.com/dotnet/aspnet:9.0
+  WORKDIR /app
+  
+  # 複製建置結果
+  COPY --from=build /out .
 
-FROM mcr.microsoft.com/dotnet/sdk:9.0-preview AS build
-WORKDIR /src
-COPY . .
-RUN dotnet publish -c Release -o /app/publish
+  EXPOSE 80  
 
-FROM base AS final
-WORKDIR /app
-COPY --from=build /app/publish .
-ENTRYPOINT ["dotnet", "backend.dll"]
+  # 指定執行入口點
+  ENTRYPOINT ["dotnet", "api-demo.dll"]
+  
