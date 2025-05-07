@@ -23,6 +23,12 @@ public static class AuthEndpoints
         }
 
         var settings = jwtOptions.Value;
+        Console.WriteLine($"JWT SecretKey = '{settings.SecretKey}'");
+        if (string.IsNullOrWhiteSpace(settings.SecretKey))
+        {
+            return Results.Problem("JWT SecretKey is not configured.");
+        }
+
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(settings.SecretKey));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 

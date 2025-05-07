@@ -14,7 +14,10 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<TodoRepository>();
         services.AddSingleton<UserRepository>();
 
-        var jwtSettings = config.GetSection(nameof(JwtSettings)).Get<JwtSettings>();
+        var jwtSettings = config.GetSection("Jwt").Get<JwtSettings>();
+        if (jwtSettings == null || string.IsNullOrWhiteSpace(jwtSettings.SecretKey))
+            throw new InvalidOperationException("JWT settings are not configured properly.");
+            
         var key = Encoding.UTF8.GetBytes(jwtSettings.SecretKey);
 
         // 🔹 加入 JWT 認證
