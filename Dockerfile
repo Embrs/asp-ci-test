@@ -17,8 +17,8 @@
   # 複製建置結果
   COPY --from=build /out .
 
-  EXPOSE 80  
+  EXPOSE 5000 
 
   # 指定執行入口點
-  ENTRYPOINT ["dotnet", "api-demo.dll"]
+  ENTRYPOINT ["dotnet", "asp-api.dll"]
   
