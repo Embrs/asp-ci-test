@@ -4,9 +4,10 @@ namespace MyApp.Repositories;
 
 public class UserRepository {
   private readonly List<User> _users = [];
+  
   private int _nextId = 1;
 
-  public IEnumerable<User> GetAll() => _users;
+  public List<User> GetAll() => _users;
 
   public User? GetById(int id) => _users.FirstOrDefault(u => u.Id == id);
 
