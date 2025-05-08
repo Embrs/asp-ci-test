@@ -1,7 +1,6 @@
-namespace TodoApi.Models;
+namespace MyApp.Models;
 
-public class UserLoginRequest
-{
-    public string Username { get; set; } = string.Empty;
-    public string Password { get; set; } = string.Empty;
+public class UserLoginRequest {
+  public string Username { get; set; } = string.Empty;
+  public string Password { get; set; } = string.Empty;
 }
