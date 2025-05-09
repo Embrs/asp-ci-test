@@ -1,0 +1,53 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+  # push:
+  #   tags:
+  #     - 'v*.*.*'
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Debug ref
+        run: echo "GITHUB_REF=$GITHUB_REF"
+
+      - name: Validate secrets
+        run: |
+          if [ -z "${{ secrets.GHCR_TOKEN }}" ] || [ -z "${{ secrets.GHCR_USERNAME }}" ]; then
+            echo "❌ GHCR credentials are not set."
+            exit 1
+          fi
+
+      - name: Log in to GHCR
+        run: echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ secrets.GHCR_USERNAME }} --password-stdin
+
+      - name: Set lowercase username
+        id: lower
+        run: echo "username_lc=${GHCR_USERNAME,,}" >> $GITHUB_OUTPUT
+        env:
+          GHCR_USERNAME: ${{ secrets.GHCR_USERNAME }}
+
+      - name: Extract version
+        id: vars
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+      - name: Build and tag Docker image
+        run: |
+          docker build -t ghcr.io/${{ steps.lower.outputs.username_lc }}/asp-ci-demo-release:${{ steps.vars.outputs.VERSION }} .
+          docker tag ghcr.io/${{ steps.lower.outputs.username_lc }}/asp-ci-demo-release:${{ steps.vars.outputs.VERSION }} ghcr.io/${{ steps.lower.outputs.username_lc }}/asp-ci-demo-release:latest
+
+      - name: Push Docker images
+        run: |
+          docker push ghcr.io/${{ steps.lower.outputs.username_lc }}/asp-ci-demo-release:${{ steps.vars.outputs.VERSION }}
+          docker push ghcr.io/${{ steps.lower.outputs.username_lc }}/asp-ci-demo-release:latest
