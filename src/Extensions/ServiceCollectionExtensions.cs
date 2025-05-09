@@ -1,11 +1,12 @@
+namespace MyApp.Extensions;
+
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using MyApp.Repositories;
 using MyApp.Endpoints;
-
-namespace MyApp.Extensions;
+using MyApp.Models;
 
 public static class ServiceCollectionExtensions {
 

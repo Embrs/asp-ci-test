@@ -1,6 +1,6 @@
-using MyApp.Models;
-
 namespace MyApp.Repositories;
+
+using MyApp.Models;
 
 public class UserRepository {
   private readonly List<UserItem> _userList = [];

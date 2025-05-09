@@ -1,7 +1,7 @@
+namespace MyApp.Endpoints;
+
 using MyApp.Models;
 using MyApp.Repositories;
-
-namespace MyApp.Endpoints;
 
 public static class DemoEndpoints {
   public static void MapDemoEndpoints(this IEndpointRouteBuilder app) {

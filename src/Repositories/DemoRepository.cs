@@ -1,6 +1,6 @@
-using MyApp.Models;
-
 namespace MyApp.Repositories;
+
+using MyApp.Models;
 
 public class DemoRepository {
   private readonly List<DemoItem> _demoList = [];

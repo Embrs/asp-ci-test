@@ -1,9 +1,7 @@
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Routing;
+namespace MyApp.Endpoints;
+
 using MyApp.Models;
 using MyApp.Repositories;
-
-namespace MyApp.Endpoints;
 
 public static class UserEndpoints {
   public static void MapUserEndpoints(this IEndpointRouteBuilder app) {

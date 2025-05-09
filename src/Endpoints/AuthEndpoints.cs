@@ -1,11 +1,11 @@
+namespace MyApp.Endpoints;
+
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using MyApp.Models;
-
-namespace MyApp.Endpoints;
 
 public static class AuthEndpoints {
 	public static void MapAuthEndpoints(this IEndpointRouteBuilder app) {
