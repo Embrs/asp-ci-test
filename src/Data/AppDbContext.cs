@@ -6,5 +6,5 @@ namespace Data;
 public class AppDbContext : DbContext {
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
-    public DbSet<TodoItem> todos { get; set; }  // ✅ 要定義 DbSet
+    public DbSet<TodoItem> Todos { get; set; }  // ✅ 加上這行
 }
