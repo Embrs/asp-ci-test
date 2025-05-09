@@ -25,13 +25,17 @@ public static class TodoEndpoints {
     return todoItem is not null ? Results.Ok(todoItem) : Results.NotFound();
   }
 
-  static async Task<IResult> Create(TodoItem input, AppDbContext db) {
-    db.Todos.Add(input);
+  static async Task<IResult> Create(TodoDto input, AppDbContext db) {
+    var todoItem = new TodoItem {
+      Title = input.Title,
+      IsCompleted = input.IsCompleted,
+    };
+    db.Todos.Add(todoItem);
     await db.SaveChangesAsync();
-    return Results.Created($"/api/todo/{input.Id}", input);
+    return Results.Created($"/api/todo/{todoItem.Id}", input);
   }
 
-  static async Task<IResult> Update(int id, TodoItem input, AppDbContext db) {
+  static async Task<IResult> Update(int id, TodoDto input, AppDbContext db) {
     var todoItem = await db.Todos.FindAsync(id);
     if (todoItem is null) return Results.NotFound();
 

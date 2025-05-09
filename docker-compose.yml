@@ -3,9 +3,9 @@ services:
     image: postgres:16
     container_name: aspci_postgres
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: yourpassword
-      POSTGRES_DB: yourdb
+      POSTGRES_USER: harrydev
+      POSTGRES_PASSWORD: 12345
+      POSTGRES_DB: mydb
     ports:
       - '15432:5432'
     volumes:
