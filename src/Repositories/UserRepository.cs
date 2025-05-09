@@ -3,31 +3,31 @@ using MyApp.Models;
 namespace MyApp.Repositories;
 
 public class UserRepository {
-  private readonly List<User> _users = [];
+  private readonly List<UserItem> _userList = [];
   
   private int _nextId = 1;
 
-  public List<User> GetAll() => _users;
+  public List<UserItem> GetAll() => _userList;
 
-  public User? GetById(int id) => _users.FirstOrDefault(u => u.Id == id);
+  public UserItem? GetById(int id) => _userList.FirstOrDefault(u => u.Id == id);
 
-  public User Create(string username, string email) {
-    var user = new User { Id = _nextId++, Username = username, Email = email };
-    _users.Add(user);
-    return user;
+  public UserItem Create(string username, string email) {
+    var userItem = new UserItem { Id = _nextId++, Username = username, Email = email };
+    _userList.Add(userItem);
+    return userItem;
   }
 
   public bool Update(int id, string username, string email) {
-    var user = GetById(id);
-    if (user == null) return false;
+    var userItem = GetById(id);
+    if (userItem == null) return false;
 
-    user.Username = username;
-    user.Email = email;
+    userItem.Username = username;
+    userItem.Email = email;
     return true;
   }
 
   public bool Delete(int id) {
-    var user = GetById(id);
-    return user != null && _users.Remove(user);
+    var userItem = GetById(id);
+    return userItem != null && _userList.Remove(userItem);
   }
 }

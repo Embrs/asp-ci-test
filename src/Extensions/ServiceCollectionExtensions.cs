@@ -69,8 +69,9 @@ public static class ServiceCollectionExtensions {
 
   /** 註冊應用程式服務 */
   public static IServiceCollection AddAppServices(this IServiceCollection services) {
-    services.AddSingleton<TodoRepository>();
+    services.AddSingleton<DemoRepository>();
     services.AddSingleton<UserRepository>();
+    // TODO add New service
     return services;
   }
 
@@ -101,8 +102,8 @@ public static class ServiceCollectionExtensions {
 
   /** 應用程式中間件 */
   public static WebApplication UseAppMiddlewares(this WebApplication app) {
+    app.MapDemoEndpoints();
     app.MapAuthEndpoints();
-    app.MapTodoEndpoints();
     app.MapUserEndpoints();
     // TODO add New api
     return app;
