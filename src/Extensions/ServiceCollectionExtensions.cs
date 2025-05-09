@@ -11,7 +11,7 @@ using MyApp.Models;
 public static class ServiceCollectionExtensions {
 
   /** 註冊 CORS 服務 */
-  public static IServiceCollection AdCorsServices(this IServiceCollection services) {
+  public static IServiceCollection AddCorsServices(this IServiceCollection services) {
     services.AddCors(options => {
       options.AddDefaultPolicy(policy => {
         policy.AllowAnyOrigin()  // 允許來自任何來源的請求
@@ -69,7 +69,7 @@ public static class ServiceCollectionExtensions {
   }
 
   /** 註冊應用程式服務 */
-  public static IServiceCollection AddAppServices(this IServiceCollection services) {
+  public static IServiceCollection AddApiServices(this IServiceCollection services) {
     services.AddSingleton<DemoRepository>();
     services.AddSingleton<UserRepository>();
     // TODO add New service
@@ -102,7 +102,7 @@ public static class ServiceCollectionExtensions {
   }
 
   /** 應用程式中間件 */
-  public static WebApplication UseAppMiddlewares(this WebApplication app) {
+  public static WebApplication UseApiMiddlewares(this WebApplication app) {
     app.MapDemoEndpoints();
     app.MapAuthEndpoints();
     app.MapUserEndpoints();

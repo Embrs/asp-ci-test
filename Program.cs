@@ -1,14 +1,16 @@
 using MyApp.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AdCorsServices();
+builder.Services.AddCorsServices();
 builder.Services.AddJwtServices(builder.Configuration);
-builder.Services.AddAppServices();
+builder.Services.AddApiServices();
+builder.Services.AddPostgresDb(builder.Configuration);
 
 var app = builder.Build();
 app.UseSwaggerMiddlewares();
 app.UseCorsMiddlewares();
 app.UseJwtMiddlewares();
-app.UseAppMiddlewares();
+app.UseApiMiddlewares();
+app.UsePostgresDb();
 
 app.Run();
