@@ -6,8 +6,7 @@ using MyApp.Models;
 
 public static class TodoEndpoints {
   public static void MapTodoEndpoints(this IEndpointRouteBuilder app) {
-    var group = app.MapGroup("/api/todo")
-      .RequireAuthorization(); // 🔐 加入授權
+    var group = app.MapGroup("/api/todo");
 
     group.MapGet("/", GetAll);
     group.MapGet("/{id:int}", GetById);

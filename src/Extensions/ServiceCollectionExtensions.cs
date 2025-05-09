@@ -106,6 +106,7 @@ public static class ServiceCollectionExtensions {
     app.MapDemoEndpoints();
     app.MapAuthEndpoints();
     app.MapUserEndpoints();
+    app.MapTodoEndpoints();
     // TODO add New api
     return app;
   }

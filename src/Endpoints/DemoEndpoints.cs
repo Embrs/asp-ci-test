@@ -5,8 +5,7 @@ using MyApp.Repositories;
 
 public static class DemoEndpoints {
   public static void MapDemoEndpoints(this IEndpointRouteBuilder app) {
-    var group = app.MapGroup("/api/demo")
-      .RequireAuthorization(); // 🔐 加入授權
+    var group = app.MapGroup("/api/demo");
 
     group.MapGet("/", GetAll);
     group.MapGet("/{id:int}", GetById);
@@ -29,7 +28,7 @@ public static class DemoEndpoints {
   }
 
   static IResult Update(int id, DemoDto dto, DemoRepository repo) {
-    var success = repo.Update(id, dto.Title, dto.IsComplete);
+    var success = repo.Update(id, dto.Title, dto.IsCompleted);
     return success ? Results.NoContent() : Results.NotFound();
   }
 

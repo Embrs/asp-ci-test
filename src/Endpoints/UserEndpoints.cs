@@ -5,7 +5,8 @@ using MyApp.Repositories;
 
 public static class UserEndpoints {
   public static void MapUserEndpoints(this IEndpointRouteBuilder app) {
-    var group = app.MapGroup("/api/user"); // ✅ 集中管理 prefix
+    var group = app.MapGroup("/api/user") // ✅ 集中管理 prefix
+      .RequireAuthorization(); // 🔐 加入授權
 
     group.MapGet("/", GetAll);
     group.MapGet("/{id:int}", GetById);

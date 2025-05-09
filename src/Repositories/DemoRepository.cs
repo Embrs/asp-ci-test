@@ -11,17 +11,17 @@ public class DemoRepository {
   public DemoItem? GetById(int id) => _demoList.FirstOrDefault(t => t.Id == id);
 
   public DemoItem Create(string title) {
-    var demoItem = new DemoItem { Id = _nextId++, Title = title, IsComplete = false };
+    var demoItem = new DemoItem { Id = _nextId++, Title = title, IsCompleted = false };
     _demoList.Add(demoItem);
     return demoItem;
   }
 
-  public bool Update(int id, string title, bool IsComplete) {
+  public bool Update(int id, string title, bool IsCompleted) {
     var demoItem = GetById(id);
     if (demoItem == null) return false;
 
     demoItem.Title = title;
-    demoItem.IsComplete = IsComplete;
+    demoItem.IsCompleted = IsCompleted;
     return true;
   }
 
