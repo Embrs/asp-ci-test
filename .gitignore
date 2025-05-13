@@ -9,7 +9,7 @@ obj/
 *.db-shm
 *.db-wal
 *.pdb
-appsettings.Development.json
+# appsettings.Development.json
 appsettings.Production.json
 appsettings.Staging.json
 appsettings.Local.json
