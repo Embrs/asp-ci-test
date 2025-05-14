@@ -7,14 +7,15 @@ using MyApp.Models;
 public static class PostgresDbPlugins {
   
   // Postgres Db
-  public static void SettingPostgresDb (this IServiceCollection services, IConfiguration configur) {
+  public static IServiceCollection SettingPostgresDb (this IServiceCollection services, IConfiguration configur) {
     try {
       services.AddDbContext<AppDbContext>(options => options.UseNpgsql(configur.GetConnectionString("DefaultConnection")));
     } catch (Exception) {}
+    return services;
   }
 
   // 建立資料庫
-  public static void InitPostgresDb (this WebApplication app) {
+  public static WebApplication InitPostgresDb (this WebApplication app) {
     try {
       using var scope = app.Services.CreateScope();
       var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
@@ -37,5 +38,6 @@ public static class PostgresDbPlugins {
         db.SaveChanges();
       }
     } catch (Exception) { }
+    return app;
   }
 }

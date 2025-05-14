@@ -63,21 +63,21 @@ public static class AuthApis {
 		});
 	}
 
-		private static async Task<IResult> GetMeAsync(ClaimsPrincipal jwtUser, AppDbContext db) {
-			var sub = jwtUser.FindFirstValue(JwtRegisteredClaimNames.Sub);
+		private static async Task<IResult> GetMeAsync(ClaimsPrincipal user, AppDbContext db) {
+			var sub = user.FindFirstValue(JwtRegisteredClaimNames.Sub);
 
 				if (sub == null || !Guid.TryParse(sub, out var publicId))
 						return Results.Unauthorized();
 
-				var user = await db.Users.FirstOrDefaultAsync(u => u.PublicId == publicId);
+				var u = await db.Users.FirstOrDefaultAsync(u => u.PublicId == publicId);
 
-				if (user == null)
+				if (u == null)
 						return Results.NotFound();
 
 				return Results.Ok(new
 				{
-						user.DisplayName,
-						user.PublicId,
+						u.DisplayName,
+						u.PublicId,
 				});
 	}
 }
