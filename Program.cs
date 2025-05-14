@@ -2,14 +2,14 @@ using MyApp.Plugins;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.SettingSwagger(builder.Configuration);
 builder.Services.SettingPostgresDb(builder.Configuration);
 builder.Services.SettingJwt(builder.Configuration);
+builder.Services.SettingSwagger(builder.Configuration);
 
 var app = builder.Build();
-app.InitSwagger();
+app.InitApi();
 app.InitPostgresDb();
 app.InitJwt();
-app.InitApi();
+app.InitSwagger();
 
 app.Run();

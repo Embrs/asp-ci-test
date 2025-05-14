@@ -3,7 +3,7 @@ services:
     image: postgres:16
     container_name: aspci_postgres
     environment:
-      POSTGRES_USER: harry
+      POSTGRES_USER: harrydev
       POSTGRES_PASSWORD: 12345
       POSTGRES_DB: mydb
     ports:

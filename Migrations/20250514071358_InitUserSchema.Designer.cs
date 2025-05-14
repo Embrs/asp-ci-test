@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using MyApp;
+using MyApp.Db;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace api_demo.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250514035138_InitUserSchema")]
+    [Migration("20250514071358_InitUserSchema")]
     partial class InitUserSchema
     {
         /// <inheritdoc />

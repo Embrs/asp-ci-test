@@ -25,6 +25,7 @@ public static class JwtPlugins {
           IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtConfig.SecretKey))
         };
       });
+      services.AddAuthorization();
     } catch (Exception) {}
   } 
 

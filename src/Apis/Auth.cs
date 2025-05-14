@@ -5,12 +5,16 @@ using MyApp.Models;
 using MyApp.Db;
 using Microsoft.EntityFrameworkCore;
 using MyApp.Services;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+
 public static class AuthApis {
 	public static void InitAuthApis(this WebApplication app) {
 		var group = app.MapGroup("/auth");
 
 		group.MapPost("/register", RegisterAsync);
 		group.MapPost("/login", LoginAsync);
+		group.MapGet("/me", GetMeAsync);
 	}
 
 	private static async Task<IResult> RegisterAsync(AppDbContext db, RegisterParams apiParams) {
@@ -53,8 +57,27 @@ public static class AuthApis {
 		var token = jwtService.GenerateToken(user);
 
 		return Results.Ok(new {
+			token,
 			user.PublicId,
 			user.DisplayName,
 		});
+	}
+
+		private static async Task<IResult> GetMeAsync(ClaimsPrincipal jwtUser, AppDbContext db) {
+			var sub = jwtUser.FindFirstValue(JwtRegisteredClaimNames.Sub);
+
+				if (sub == null || !Guid.TryParse(sub, out var publicId))
+						return Results.Unauthorized();
+
+				var user = await db.Users.FirstOrDefaultAsync(u => u.PublicId == publicId);
+
+				if (user == null)
+						return Results.NotFound();
+
+				return Results.Ok(new
+				{
+						user.DisplayName,
+						user.PublicId,
+				});
 	}
 }
