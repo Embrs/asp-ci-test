@@ -1,10 +1,11 @@
+namespace MyApp.Plugins;
+
 using Microsoft.EntityFrameworkCore;
 using MyApp.Db;
 using MyApp.Models;
 
-namespace MyApp.Extensions;
-
-public static class PostgresDbExtensions {  
+public static class PostgresDbPlugins {
+  
   // Postgres Db
   public static void SettingPostgresDb (this IServiceCollection services, IConfiguration configur) {
     try {

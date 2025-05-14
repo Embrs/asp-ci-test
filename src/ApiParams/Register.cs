@@ -1,6 +1,6 @@
-namespace MyApp.Dtos;
+namespace MyApp.ApiParams;
 
-public record RegisterDto(
+public record RegisterParams(
   string Email,
   string Password,
   string DisplayName

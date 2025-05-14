@@ -1,4 +1,4 @@
-using MyApp.Extensions;
+using MyApp.Plugins;
 
 var builder = WebApplication.CreateBuilder(args);
 

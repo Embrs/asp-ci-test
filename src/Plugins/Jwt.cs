@@ -1,10 +1,12 @@
 
+namespace MyApp.Plugins;
+
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using MyApp.Config;
 using MyApp.Services;
 
-public static class JwtExtensions {  
+public static class JwtPlugins {  
   // JWT 設定
   public static void SettingJwt (this IServiceCollection services, IConfiguration configur) {
     try {
