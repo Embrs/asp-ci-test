@@ -1,7 +1,7 @@
 using MyApp.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace MyApp;
+namespace MyApp.Db;
 
 public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
 {
