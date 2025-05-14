@@ -1,16 +1,15 @@
-using MyApp.Extensions;
+using MyApp;
+using MyApp.Endpoints;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddCorsServices();
-builder.Services.AddJwtServices(builder.Configuration);
-builder.Services.AddApiServices();
-builder.Services.AddPostgresDb(builder.Configuration);
+
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 var app = builder.Build();
-app.UseSwaggerMiddlewares();
-app.UseCorsMiddlewares();
-app.UseJwtMiddlewares();
-app.UseApiMiddlewares();
-app.UsePostgresDb();
+
+app.Seed();
+app.MapAuthEndpoints();
 
 app.Run();

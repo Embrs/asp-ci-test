@@ -1,45 +1,37 @@
+using MyApp.Dtos;
+using MyApp.Models;
+using Microsoft.EntityFrameworkCore;
+
 namespace MyApp.Endpoints;
 
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
-using MyApp.Models;
-
 public static class AuthEndpoints {
-	public static void MapAuthEndpoints(this IEndpointRouteBuilder app) {
-		app.MapPost("/api/auth/login", Login);
-	}
+	public static void MapAuthEndpoints(this WebApplication app) {
+		app.MapPost("/auth/register", async (
+			AppDbContext db,
+			RegisterDto dto
+		) => {
+			if (await db.UserCredentials.AnyAsync(c => c.Provider == "local" && c.Identifier == dto.Email)) {
+				return Results.Conflict("Email already registered.");
+			}
 
-	static IResult Login(UserLoginRequest request, IOptions<JwtSettings> jwtOptions) {
-		// 🚧 模擬帳號密碼驗證（實際應查資料庫）
-		if (request.Username != "admin" || request.Password != "1234") {
-				return Results.Unauthorized();
-		}
+			var user = new User {
+				DisplayName = dto.DisplayName,
+				Credentials = [
+					new UserCredential {
+						Provider = "local",
+						Identifier = dto.Email,
+						PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password),
+					}
+				]
+			};
 
-		var settings = jwtOptions.Value;
-		Console.WriteLine($"JWT SecretKey = '{settings.SecretKey}'");
-		if (string.IsNullOrWhiteSpace(settings.SecretKey)) {
-				return Results.Problem("JWT SecretKey is not configured.");
-		}
+			db.Users.Add(user);
+			await db.SaveChangesAsync();
 
-		var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(settings.SecretKey));
-		var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-		var claims = new[] {
-				new Claim(JwtRegisteredClaimNames.Sub, request.Username),
-				new Claim("role", "admin"),
-				new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-		};
-
-		var token = new JwtSecurityToken(
-				claims: claims,
-				expires: DateTime.UtcNow.AddMinutes(settings.ExpireMinutes),
-				signingCredentials: creds
-		);
-
-		var jwt = new JwtSecurityTokenHandler().WriteToken(token);
-		return Results.Ok(new { token = jwt });
+			return Results.Created($"/users/{user.PublicId}", new {
+				user.PublicId,
+				user.DisplayName,
+			});
+		});
 	}
 }
