@@ -28,7 +28,7 @@ public class JwtService {
       issuer: _config.Issuer,
       audience: _config.Audience,
       claims: claims,
-      expires: DateTime.UtcNow.AddMinutes(_config.ExpiryMinutes),
+      expires: DateTime.UtcNow.AddMinutes(_config.ExpireMinutes),
       signingCredentials: creds
     );
 

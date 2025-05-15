@@ -14,9 +14,16 @@ public static class JwtPlugins {
       var jwtSection = configur.GetSection("Jwt");
       var jwtConfig = jwtSection.Get<JwtConfig>()!;
       services.AddSingleton(jwtConfig);
-      services.AddSingleton<JwtService>();
-      services.AddAuthentication("Bearer").AddJwtBearer("Bearer", options => {
-        options.TokenValidationParameters = new TokenValidationParameters {
+
+      // ✅ 加入這行以註冊 JwtService
+      services.AddScoped<JwtService>();
+
+      services.AddAuthentication(options =>  {
+        options.DefaultAuthenticateScheme = "Bearer";
+        options.DefaultChallengeScheme = "Bearer";
+      })
+      .AddJwtBearer("Bearer", options => {
+        options.TokenValidationParameters = new TokenValidationParameters  {
           ValidateIssuer = true,
           ValidateAudience = true,
           ValidateLifetime = true,
@@ -26,7 +33,6 @@ public static class JwtPlugins {
           IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtConfig.SecretKey))
         };
 
-        // 加入以下錯誤日誌設定
         options.Events = new JwtBearerEvents {
           OnAuthenticationFailed = context => {
             Console.WriteLine($"[JWT ERROR] {context.Exception.Message}");
@@ -37,10 +43,9 @@ public static class JwtPlugins {
             return Task.CompletedTask;
           }
         };
-
       });
-      services.AddAuthorization();
-    } catch (Exception) {}
+    }
+    catch (Exception) {}
     return services;
   } 
 

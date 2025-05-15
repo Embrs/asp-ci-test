@@ -11,7 +11,15 @@ builder.Services.SettingJwt(builder.Configuration);
 builder.Services.SettingSwagger(builder.Configuration);
 
 var app = builder.Build();
+
 app.InitPostgresDb();
+
+app.Use(async (context, next) =>
+{
+    Console.WriteLine($"[Pipeline] Request path: {context.Request.Path}");
+    await next();
+});
+
 app.InitJwt();
 app.InitApi();
 app.InitSwagger();
