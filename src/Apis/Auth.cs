@@ -76,9 +76,10 @@ public static class AuthApis {
 
 		var user = context.User;
 
-		var id = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+		var sub =user.FindFirst("sub")?.Value ?? user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-		if (id == null || !Guid.TryParse(id, out var publicId)) {
+
+		if (sub == null || !Guid.TryParse(sub, out var publicId)) {
 			return Results.Unauthorized();
 		}
 
