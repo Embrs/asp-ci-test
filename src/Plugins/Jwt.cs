@@ -45,7 +45,10 @@ public static class JwtPlugins {
         };
       });
     }
-    catch (Exception) {}
+    catch (Exception) {
+      Console.WriteLine($"[SettingJwt ERROR]");  
+    }
+    Console.WriteLine($"[SettingJwt OK]");
     return services;
   } 
 
@@ -54,7 +57,10 @@ public static class JwtPlugins {
     try {
       app.UseAuthentication();
       app.UseAuthorization();
-    } catch (Exception) {}
+    } catch (Exception) {
+      Console.WriteLine($"[InitJwt ERROR] {app.Environment.EnvironmentName}");  
+    }
+    Console.WriteLine($"[InitJwt OK]");
     return app;
   }
 }

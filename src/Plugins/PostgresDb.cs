@@ -10,7 +10,10 @@ public static class PostgresDbPlugins {
   public static IServiceCollection SettingPostgresDb (this IServiceCollection services, IConfiguration configur) {
     try {
       services.AddDbContext<AppDbContext>(options => options.UseNpgsql(configur.GetConnectionString("DefaultConnection")));
-    } catch (Exception) {}
+    } catch (Exception) {
+      Console.WriteLine($"[SettingPostgresDb ERROR]");  
+    }
+    Console.WriteLine($"[SettingPostgresDb OK]");
     return services;
   }
 
@@ -37,7 +40,10 @@ public static class PostgresDbPlugins {
         db.Users.Add(user);
         db.SaveChanges();
       }
-    } catch (Exception) { }
+    } catch (Exception) {
+      Console.WriteLine($"[InitPostgresDb ERROR]"); 
+    }
+    Console.WriteLine($"[InitPostgresDb OK]");
     return app;
   }
 }

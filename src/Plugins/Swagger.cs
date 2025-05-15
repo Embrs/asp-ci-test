@@ -29,8 +29,10 @@ public static class SwaggerPlugins {
         options.AddSecurityRequirement(new OpenApiSecurityRequirement {{ jwtScheme, Array.Empty<string>() }});
       });
     }
-    catch (Exception) {}
-
+    catch (Exception) {
+      Console.WriteLine($"[SettingSwagger ERROR]"); 
+    }
+    Console.WriteLine($"[SettingSwagger OK]"); 
     return services;
   }
 
@@ -41,8 +43,10 @@ public static class SwaggerPlugins {
         options.SwaggerEndpoint("/swagger/v1/swagger.json", "Todo API V1");
       });
     }
-    catch (Exception) {}
-
+    catch (Exception) {
+      Console.WriteLine($"[InitSwagger ERROR]"); 
+    }
+    Console.WriteLine($"[InitSwagger OK]"); 
     return app;
   }
 }
