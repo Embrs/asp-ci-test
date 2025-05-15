@@ -1,7 +1,7 @@
 
 namespace MyApp.Plugins;
 
-using System.Text;
+using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using MyApp.Config;
@@ -14,12 +14,16 @@ public static class JwtPlugins {
       var jwtSection = configur.GetSection("Jwt");
       var jwtConfig = jwtSection.Get<JwtConfig>()!;
       services.AddSingleton(jwtConfig);
+      
+      var secretBytes = Convert.FromBase64String(jwtConfig.SecretKey);
+      // JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear(); // 🧨 禁用預設 Claim type 映射
 
       services.AddAuthentication(options =>  {
         options.DefaultAuthenticateScheme = "Bearer";
         options.DefaultChallengeScheme = "Bearer";
       })
       .AddJwtBearer("Bearer", options => {
+        options.RequireHttpsMetadata = false; // ← 本地開發建議關閉
         options.TokenValidationParameters = new TokenValidationParameters  {
           ValidateIssuer = true,
           ValidateAudience = true,
@@ -27,7 +31,8 @@ public static class JwtPlugins {
           ValidateIssuerSigningKey = true,
           ValidIssuer = jwtConfig.Issuer,
           ValidAudience = jwtConfig.Audience,
-          IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtConfig.SecretKey))
+          IssuerSigningKey = new SymmetricSecurityKey(secretBytes),
+          ClockSkew = TimeSpan.Zero, // 👈 建議明確設定
         };
 
         options.Events = new JwtBearerEvents {
@@ -56,8 +61,17 @@ public static class JwtPlugins {
   // 建立資料庫
   public static WebApplication InitJwt (this WebApplication app) {
     try {
+      app.UseRouting(); 
       app.UseAuthentication();
-      app.UseAuthorization();
+      app.UseAuthorization();   
+      // app.Use(async (ctx, next) => {
+      //   Console.WriteLine($"[Middleware] Authenticated: {ctx.User.Identity?.IsAuthenticated}");
+      //   Console.WriteLine($"[Middleware] Name: {ctx.User.Identity?.Name}");
+      //   Console.WriteLine($"[Middleware] Claims: {string.Join(", ", ctx.User.Claims.Select(c => $"{c.Type}={c.Value}"))}");
+      //   Console.WriteLine($"[Middleware] sub: {ctx.User.FindFirst("sub")?.Value}");
+
+      //   await next();
+      // });
     } catch (Exception ex) {
       var env = app.Environment;
       Console.WriteLine($"[InitJwt ERROR] {env.EnvironmentName}: {ex.Message}");  

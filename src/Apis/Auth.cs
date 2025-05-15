@@ -9,12 +9,13 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
 public static class AuthApis {
-	public static void InitAuthApis(this WebApplication app) {
+	public static WebApplication InitAuthApis(this WebApplication app) {
 		var group = app.MapGroup("/auth");
 
 		group.MapPost("/register", RegisterAsync);
 		group.MapPost("/login", LoginAsync);
-		group.MapGet("/me", GetMeAsync).RequireAuthorization();
+		group.MapGet("/me", GetMeAsync).RequireAuthorization();;
+		return app;
 	}
 
 	private static async Task<IResult> RegisterAsync(AppDbContext db, RegisterParams apiParams) {
@@ -63,21 +64,26 @@ public static class AuthApis {
 		});
 	}
 
-	private static async Task<IResult> GetMeAsync(ClaimsPrincipal user, AppDbContext db) {
-		var sub = user.FindFirstValue(JwtRegisteredClaimNames.Sub);
-		Console.WriteLine($"[GetMeAsync sub] {sub}");
+	private static async Task<IResult> GetMeAsync(HttpContext context, AppDbContext db) {
 
-		if (sub == null || !Guid.TryParse(sub, out var publicId)) {
-			Console.WriteLine($"[GetMeAsync null] ");
+		var authHeader = context.Request.Headers.Authorization.ToString();
+
+		if (string.IsNullOrEmpty(authHeader) || !authHeader.StartsWith("Bearer ")) {
+			return Results.Unauthorized();
+		}
+
+		var token = authHeader.Substring("Bearer ".Length);
+
+		var user = context.User;
+
+		var id = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+		if (id == null || !Guid.TryParse(id, out var publicId)) {
 			return Results.Unauthorized();
 		}
 
 		var u = await db.Users.FirstOrDefaultAsync(u => u.PublicId == publicId);
-		Console.WriteLine($"[GetMeAsync user] {u}");
-		if (u == null) {
-			Console.WriteLine($"[GetMeAsync user null]");
-			return Results.NotFound();
-		}
+		if (u == null) return Results.NotFound();
 
 		return Results.Ok(new {
 			u.DisplayName,

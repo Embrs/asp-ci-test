@@ -20,8 +20,8 @@ public class JwtService {
       new Claim("name", user.DisplayName),
       new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
     };
-
-    var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config.SecretKey));
+    var secretBytes = Convert.FromBase64String(_config.SecretKey);
+    var key = new SymmetricSecurityKey(secretBytes);
     var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
     var token = new JwtSecurityToken(
@@ -31,7 +31,7 @@ public class JwtService {
       expires: DateTime.UtcNow.AddMinutes(_config.ExpireMinutes),
       signingCredentials: creds
     );
-
-    return new JwtSecurityTokenHandler().WriteToken(token);
+    var sToken = new JwtSecurityTokenHandler().WriteToken(token);
+    return sToken;
   }
 }
