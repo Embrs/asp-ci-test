@@ -15,9 +15,6 @@ public static class JwtPlugins {
       var jwtConfig = jwtSection.Get<JwtConfig>()!;
       services.AddSingleton(jwtConfig);
 
-      // ✅ 加入這行以註冊 JwtService
-      services.AddScoped<JwtService>();
-
       services.AddAuthentication(options =>  {
         options.DefaultAuthenticateScheme = "Bearer";
         options.DefaultChallengeScheme = "Bearer";
@@ -43,7 +40,11 @@ public static class JwtPlugins {
             return Task.CompletedTask;
           }
         };
-      });
+      }); 
+      // ✅ 這行是解決錯誤的關鍵
+      services.AddAuthorization(); 
+      // ✅ 加入這行以註冊 JwtService
+      services.AddScoped<JwtService>();
     }
     catch (Exception) {
       Console.WriteLine($"[SettingJwt ERROR]");  
@@ -57,8 +58,9 @@ public static class JwtPlugins {
     try {
       app.UseAuthentication();
       app.UseAuthorization();
-    } catch (Exception) {
-      Console.WriteLine($"[InitJwt ERROR] {app.Environment.EnvironmentName}");  
+    } catch (Exception ex) {
+      var env = app.Environment;
+      Console.WriteLine($"[InitJwt ERROR] {env.EnvironmentName}: {ex.Message}");  
     }
     Console.WriteLine($"[InitJwt OK]");
     return app;

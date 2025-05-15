@@ -65,12 +65,19 @@ public static class AuthApis {
 
 	private static async Task<IResult> GetMeAsync(ClaimsPrincipal user, AppDbContext db) {
 		var sub = user.FindFirstValue(JwtRegisteredClaimNames.Sub);
+		Console.WriteLine($"[InitJwt sub] {sub}");
 
-		if (sub == null || !Guid.TryParse(sub, out var publicId)) return Results.Unauthorized();
+		if (sub == null || !Guid.TryParse(sub, out var publicId)) {
+			Console.WriteLine($"[InitJwt null] ");
+			return Results.Unauthorized();
+		}
 
 		var u = await db.Users.FirstOrDefaultAsync(u => u.PublicId == publicId);
-
-		if (u == null) return Results.NotFound();
+		Console.WriteLine($"[InitJwt user] {u}");
+		if (u == null) {
+			Console.WriteLine($"[InitJwt user null]");
+			return Results.NotFound();
+		}
 
 		return Results.Ok(new {
 			u.DisplayName,
