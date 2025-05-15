@@ -14,7 +14,7 @@ public static class AuthApis {
 
 		group.MapPost("/register", RegisterAsync);
 		group.MapPost("/login", LoginAsync);
-		group.MapGet("/me", GetMeAsync);
+		group.MapGet("/me", GetMeAsync).RequireAuthorization();
 	}
 
 	private static async Task<IResult> RegisterAsync(AppDbContext db, RegisterParams apiParams) {
