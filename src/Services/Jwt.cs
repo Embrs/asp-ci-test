@@ -2,10 +2,11 @@ namespace MyApp.Services;
 
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Text;
 using MyApp.Models;
 using Microsoft.IdentityModel.Tokens;
 using MyApp.Config;
+using MyApp.Db;
+using Microsoft.EntityFrameworkCore;
 
 public class JwtService {
   private readonly JwtConfig _config;
@@ -13,6 +14,7 @@ public class JwtService {
   public JwtService(JwtConfig config) {
     _config = config;
   }
+
 
   public string GenerateToken(User user) {
     var claims = new[] {
@@ -34,4 +36,16 @@ public class JwtService {
     var sToken = new JwtSecurityTokenHandler().WriteToken(token);
     return sToken;
   }
+
+  public Guid? CheckToken(HttpContext context) {
+    // var authHeader = context.Request.Headers.Authorization.ToString();
+    // var token = authHeader.Substring("Bearer ".Length);
+    // var principal = tokenValidator.ValidateToken(token);
+
+		var cUser = context.User;
+    var sub = cUser.FindFirst("sub")?.Value ?? cUser.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+		if (sub == null || !Guid.TryParse(sub, out var userId)) return null;
+    return userId;
+  }
+
 }

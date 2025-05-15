@@ -5,7 +5,7 @@ public static class ApiPlugins {
   // API
   public static WebApplication InitApi(this WebApplication app) {
     try {
-      app.InitAuthApis();
+      app.InitBaseApis();
     } catch (Exception) {
       Console.WriteLine($"[InitApi ERROR]");  
     }
