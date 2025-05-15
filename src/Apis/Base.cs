@@ -5,20 +5,19 @@ using MyApp.Models;
 using MyApp.Db;
 using Microsoft.EntityFrameworkCore;
 using MyApp.Services;
-using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
-public static class AuthApis {
-	public static WebApplication InitAuthApis(this WebApplication app) {
-		var group = app.MapGroup("/auth");
 
-		group.MapPost("/register", RegisterAsync);
-		group.MapPost("/login", LoginAsync);
-		group.MapGet("/me", GetMeAsync).RequireAuthorization();;
+public static class AuthApis {
+	public static WebApplication InitBaseApis(this WebApplication app) {
+		var baseGroup = app.MapGroup("/api/base/");
+		baseGroup.MapPost("sign-up", ApiSignUp);
+		baseGroup.MapPost("sign-in", ApiSignIn);
+		baseGroup.MapGet("self/info", ApiGetSelfInfo).RequireAuthorization();;
 		return app;
 	}
 
-	private static async Task<IResult> RegisterAsync(AppDbContext db, RegisterParams apiParams) {
+	private static async Task<IResult> ApiSignUp(AppDbContext db, RegisterParams apiParams) {
 		if (await db.UserCredentials.AnyAsync(c => c.Provider == "local" && c.Identifier == apiParams.Email)) {
 			return Results.Conflict("Email already registered.");
 		}
@@ -43,7 +42,7 @@ public static class AuthApis {
 		});
 	}
 
-	private static async Task<IResult> LoginAsync(AppDbContext db, LoginParams apiParams, JwtService jwtService) {
+	private static async Task<IResult> ApiSignIn(AppDbContext db, LoginParams apiParams, JwtService jwtService) {
 		var credential = await db.UserCredentials
 			.Include(uc => uc.User)
 			.FirstOrDefaultAsync(uc =>
@@ -64,7 +63,7 @@ public static class AuthApis {
 		});
 	}
 
-	private static async Task<IResult> GetMeAsync(HttpContext context, AppDbContext db) {
+	private static async Task<IResult> ApiGetSelfInfo(HttpContext context, AppDbContext db) {
 
 		var authHeader = context.Request.Headers.Authorization.ToString();
 
