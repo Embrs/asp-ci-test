@@ -76,7 +76,7 @@ public static class AuthApis {
 
 	/** 取得自己的資料 */
 	private static async Task<IResult> ApiGetSelfInfo(HttpContext context, AppDbContext db, RedisService redisService) {
-		// 1. 取得 token 中的 user id
+		// 1. 取得 token
 		var tokenInfo = await redisService.GetTokenInfo(context);
 		if (tokenInfo == null) return Results.Unauthorized();
 
