@@ -9,10 +9,11 @@ using MyApp.Services;
 
 public static class AuthApis {
 	public static WebApplication InitBaseApis(this WebApplication app) {
-		var baseGroup = app.MapGroup("/api/base/");
-		baseGroup.MapPost("sign-up", ApiSignUp);
-		baseGroup.MapPost("sign-in", ApiSignIn);
-		baseGroup.MapGet("self/info", ApiGetSelfInfo);
+		var baseGroup = app.MapGroup("/api/base");
+		baseGroup.MapPost("/sign-up", ApiSignUp);
+		baseGroup.MapPost("/sign-in", ApiSignIn);
+		baseGroup.MapPost("/logout", ApiLogout);
+		baseGroup.MapGet("/self/info", ApiGetSelfInfo);
 		return app;
 	}
 
@@ -70,14 +71,17 @@ public static class AuthApis {
 		});
 	}
 
+	/** 登出 */ // TODO
+	private static IResult ApiLogout() => Results.Ok();
+
 	/** 取得自己的資料 */
 	private static async Task<IResult> ApiGetSelfInfo(HttpContext context, AppDbContext db, JwtService jwtService) {
 		// 1. 取得 JWT token 中的 user id
-		var userId = jwtService.CheckToken(context);
-		if (userId == null) return Results.Unauthorized();
+		var tokenUserId = jwtService.CheckToken(context);
+		if (tokenUserId == null) return Results.Unauthorized();
 
 		// 2. 根據 user id 取得使用者資料
-		var userInfo = await db.Users.FirstOrDefaultAsync(u => u.PublicId == userId);
+		var userInfo = await db.Users.FirstOrDefaultAsync(u => u.PublicId == tokenUserId);
 		if (userInfo == null) return Results.NotFound();
 
 		return Results.Ok(new {
