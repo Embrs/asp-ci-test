@@ -7,12 +7,12 @@ builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 builder.Logging.SetMinimumLevel(LogLevel.Debug);
 
-builder.Services.SettingJwt(builder.Configuration);
-builder.Services.SettingPostgresDb(builder.Configuration);
-builder.Services.SettingSwagger(builder.Configuration);
+builder.Services.AddPostgresDb(builder.Configuration);
+builder.Services.AddRedis(builder.Configuration);
+builder.Services.AddSwagger();
 
 var app = builder.Build();
-app.InitJwt();
+
 app.InitPostgresDb();
 app.InitSwagger();
 app.InitApi();

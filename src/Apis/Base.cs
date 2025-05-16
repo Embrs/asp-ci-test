@@ -44,7 +44,7 @@ public static class AuthApis {
 	}
 
 	/** 登入 */
-	private static async Task<IResult> ApiSignIn(AppDbContext db, LoginParams apiParams, JwtService jwtService) {
+	private static async Task<IResult> ApiSignIn(HttpContext context, AppDbContext db, LoginParams apiParams,RedisService redisService) {
 		// 1. 尋找用戶
 		var credential = await db.UserCredentials
 			.Include(uc => uc.User)
@@ -62,7 +62,7 @@ public static class AuthApis {
 		var userInfo = credential.User;
 
 		// 4. 產生 token
-		var token = jwtService.GenerateToken(userInfo);
+		var token = redisService.CreateToken(userInfo, context);
 
 		return Results.Ok(new {
 			token,
@@ -75,13 +75,13 @@ public static class AuthApis {
 	private static IResult ApiLogout() => Results.Ok();
 
 	/** 取得自己的資料 */
-	private static async Task<IResult> ApiGetSelfInfo(HttpContext context, AppDbContext db, JwtService jwtService) {
-		// 1. 取得 JWT token 中的 user id
-		var tokenUserId = jwtService.CheckToken(context);
-		if (tokenUserId == null) return Results.Unauthorized();
+	private static async Task<IResult> ApiGetSelfInfo(HttpContext context, AppDbContext db, RedisService redisService) {
+		// 1. 取得 token 中的 user id
+		var tokenInfo = await redisService.GetTokenInfo(context);
+		if (tokenInfo == null) return Results.Unauthorized();
 
 		// 2. 根據 user id 取得使用者資料
-		var userInfo = await db.Users.FirstOrDefaultAsync(u => u.PublicId == tokenUserId);
+		var userInfo = await db.Users.FirstOrDefaultAsync(u => u.PublicId == tokenInfo.userId);
 		if (userInfo == null) return Results.NotFound();
 
 		return Results.Ok(new {

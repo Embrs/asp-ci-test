@@ -7,13 +7,13 @@ using MyApp.Models;
 public static class PostgresDbPlugins {
   
   // Postgres Db
-  public static IServiceCollection SettingPostgresDb (this IServiceCollection services, IConfiguration configur) {
+  public static IServiceCollection AddPostgresDb (this IServiceCollection services, IConfiguration config) {
     try {
-      services.AddDbContext<AppDbContext>(options => options.UseNpgsql(configur.GetConnectionString("DefaultConnection")));
+      services.AddDbContext<AppDbContext>(options => options.UseNpgsql(config.GetConnectionString("Postgres")));
     } catch (Exception) {
-      Console.WriteLine($"[SettingPostgresDb ERROR]");  
+      Console.WriteLine($"[AddostgresDb ERROR]");  
     }
-    Console.WriteLine($"[SettingPostgresDb OK]");
+    Console.WriteLine($"[AddostgresDb OK]");
     return services;
   }
 

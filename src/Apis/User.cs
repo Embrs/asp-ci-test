@@ -1,11 +1,9 @@
 namespace MyApp.Apis;
 
-using MyApp.ApiParams;
 using MyApp.Models;
 using MyApp.Db;
 using Microsoft.EntityFrameworkCore;
 using MyApp.Services;
-
 
 public static class UserApis {
 	public static WebApplication InitUserApis(this WebApplication app) {
@@ -20,11 +18,11 @@ public static class UserApis {
 	private static async Task<IResult> ApiGetUser(
 		int id, 
 		AppDbContext db,
-		HttpContext context, 
-		JwtService jwtService
+		HttpContext context,
+		RedisService redisService
 	) {
-		var tokenUserId = jwtService.CheckToken(context);
-		if (tokenUserId == null) return Results.Unauthorized();
+		var tokenInfo = await redisService.GetTokenInfo(context);
+		if (tokenInfo == null) return Results.Unauthorized();
 
 		var user = await db.Users.FirstOrDefaultAsync(u => u.Id == id);
 		if (user == null) return Results.NotFound();
@@ -36,11 +34,11 @@ public static class UserApis {
 		int id, 
 		AppDbContext db,
 		HttpContext context, 
-		JwtService jwtService,
+		RedisService redisService,
 	 	User apiParams
 	) {
-		var tokenUserId = jwtService.CheckToken(context);
-		if (tokenUserId == null) return Results.Unauthorized();
+		var tokenInfo = await redisService.GetTokenInfo(context);
+		if (tokenInfo == null) return Results.Unauthorized();
 
 		var user = await db.Users.FirstOrDefaultAsync(u => u.Id == id);
 		if (user == null) return Results.NotFound();
@@ -54,12 +52,12 @@ public static class UserApis {
 		int id, 
 		AppDbContext db,
 		HttpContext context, 
-		JwtService jwtService,
+		RedisService redisService,
 	 	User apiParams
 	) {
-		var tokenUserId = jwtService.CheckToken(context);
-		if (tokenUserId == null) return Results.Unauthorized();
-
+		var tokenInfo = await redisService.GetTokenInfo(context);
+		if (tokenInfo == null) return Results.Unauthorized();
+		
 		var user = await db.Users.FirstOrDefaultAsync(u => u.Id == id);
 		if (user == null) return Results.NotFound();
 		db.Users.Remove(user);
