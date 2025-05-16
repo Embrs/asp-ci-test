@@ -6,6 +6,7 @@ public static class ApiPlugins {
   public static WebApplication InitApi(this WebApplication app) {
     try {
       app.InitBaseApis();
+      app.InitUserApis();
     } catch (Exception) {
       Console.WriteLine($"[InitApi ERROR]");  
     }
