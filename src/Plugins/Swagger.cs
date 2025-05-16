@@ -11,10 +11,11 @@ public static class SwaggerPlugins {
 
         var tokenScheme = new OpenApiSecurityScheme {
           Name = "Authorization",
+          Type = SecuritySchemeType.Http, // ✅ 使用 Http 類型
+          Scheme = "bearer",              // ✅ 小寫 "bearer"
+          // BearerFormat = "JWT",           // 可選，加強說明用途
           In = ParameterLocation.Header,
-          Type = SecuritySchemeType.ApiKey,
-          Scheme = "Bearer",
-          Description = "請輸入 Bearer <token> 來驗證身份",
+          Description = "請輸入 token，例如：Bearer <value>",
           Reference = new OpenApiReference {
             Type = ReferenceType.SecurityScheme,
             Id = "Bearer",

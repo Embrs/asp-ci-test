@@ -1,6 +1,7 @@
 
 namespace MyApp.Plugins;
 
+using MyApp.Services;
 using StackExchange.Redis;
 
 public static class RedisPlugins {  
@@ -9,9 +10,11 @@ public static class RedisPlugins {
     try {
       services.AddSingleton<IConnectionMultiplexer>(sp => {
         var redisHost = config.GetConnectionString("Redis") ?? "localhost:6379";
-        var options = ConfigurationOptions.Parse(redisHost, true);
-        return ConnectionMultiplexer.Connect(options);
+        // var options = ConfigurationOptions.Parse(redisHost, true);
+        return ConnectionMultiplexer.Connect(redisHost);
       });
+
+      services.AddSingleton<RedisService>();
     }
     catch (Exception) {
       Console.WriteLine($"[AddRedis ERROR]");  

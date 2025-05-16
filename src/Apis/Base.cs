@@ -5,7 +5,8 @@ using MyApp.Models;
 using MyApp.Db;
 using Microsoft.EntityFrameworkCore;
 using MyApp.Services;
-
+using MyApp.Filters;
+using Microsoft.AspNetCore.Mvc;
 
 public static class AuthApis {
 	public static WebApplication InitBaseApis(this WebApplication app) {
@@ -13,12 +14,15 @@ public static class AuthApis {
 		baseGroup.MapPost("/sign-up", ApiSignUp);
 		baseGroup.MapPost("/sign-in", ApiSignIn);
 		baseGroup.MapPost("/logout", ApiLogout);
-		baseGroup.MapGet("/self/info", ApiGetSelfInfo);
+		baseGroup.MapGet("/self/info", ApiGetSelfInfo).AddEndpointFilter<RequireUserFilter>();
 		return app;
 	}
 
 	/** 註冊 */
-	private static async Task<IResult> ApiSignUp(AppDbContext db, RegisterParams apiParams) {
+	private static async Task<IResult> ApiSignUp(
+		[FromServices] AppDbContext db,
+		[FromBody] SignUpParams apiParams
+	) {
 		if (await db.UserCredentials.AnyAsync(c => c.Provider == "local" && c.Identifier == apiParams.Email)) {
 			return Results.Conflict("Email already registered.");
 		}
@@ -44,7 +48,12 @@ public static class AuthApis {
 	}
 
 	/** 登入 */
-	private static async Task<IResult> ApiSignIn(HttpContext context, AppDbContext db, LoginParams apiParams,RedisService redisService) {
+	private static async Task<IResult> ApiSignIn(
+		HttpContext context,
+		[FromServices] AppDbContext db,
+		[FromServices] RedisService redisService,
+		[FromBody] SignInParams apiParams
+	) {
 		// 1. 尋找用戶
 		var credential = await db.UserCredentials
 			.Include(uc => uc.User)
@@ -62,8 +71,7 @@ public static class AuthApis {
 		var userInfo = credential.User;
 
 		// 4. 產生 token
-		var token = redisService.CreateToken(userInfo, context);
-
+		var token = await redisService.CreateToken(userInfo, context);
 		return Results.Ok(new {
 			token,
 			userInfo.PublicId,
@@ -71,22 +79,26 @@ public static class AuthApis {
 		});
 	}
 
-	/** 登出 */ // TODO
-	private static IResult ApiLogout() => Results.Ok();
+  /** 登出 */
+  private static async Task<IResult> ApiLogout(
+    HttpContext context,
+		[FromServices] RedisService redisService
+  )
+  {
+    await redisService.DeleteToken(context);
+    return Results.Ok();
+  }
 
-	/** 取得自己的資料 */
-	private static async Task<IResult> ApiGetSelfInfo(HttpContext context, AppDbContext db, RedisService redisService) {
-		// 1. 取得 token
-		var tokenInfo = await redisService.GetTokenInfo(context);
-		if (tokenInfo == null) return Results.Unauthorized();
-
-		// 2. 根據 user id 取得使用者資料
-		var userInfo = await db.Users.FirstOrDefaultAsync(u => u.PublicId == tokenInfo.userId);
-		if (userInfo == null) return Results.NotFound();
-
+  /** 取得自己的資料 */
+  private static IResult ApiGetSelfInfo(
+		HttpContext context, 
+		[FromServices] AppDbContext db
+	) {
+		var tokenUser = context.Items["tokenUser"] as User;
+    if (tokenUser is null) return Results.Unauthorized();
 		return Results.Ok(new {
-			userInfo.DisplayName,
-			userInfo.PublicId,
+			tokenUser.DisplayName,
+			tokenUser.PublicId,
 		});
 	}
 }

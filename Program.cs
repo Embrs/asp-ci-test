@@ -1,4 +1,5 @@
 using MyApp.Plugins;
+using MyApp.Services;
 Microsoft.IdentityModel.Logging.IdentityModelEventSource.ShowPII = true;
 
 var builder = WebApplication.CreateBuilder(args);
